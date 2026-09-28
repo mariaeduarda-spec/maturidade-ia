@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maturidade em IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#F7F7FA; --card:#FFFFFF; --ink:#1F2937; --muted:#6B7280; --line:#E6E8EE;
+  --purple:#742CFF; --purple-soft:#EFE7FF; --part:#C4A8FF; --no:#E6E8EE; --green:#00FFB6; --green-ink:#007A58; --green-soft:#DDFBF1;
+  --shadow:0 1px 2px rgba(31,41,55,.04),0 8px 24px rgba(31,41,55,.06);
+  --glow-a:rgba(116,44,255,.22); --glow-b:rgba(0,255,182,.22);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#12141B; --card:#1B1E27; --ink:#F2F3F7; --muted:#A0A6B4; --line:#2B2F3B;
+    --purple:#8F55FF; --purple-soft:#2A2145; --part:#5E43A6; --no:#343947; --green-ink:#00FFB6; --green-soft:#10352C;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    --glow-a:rgba(143,85,255,.25); --glow-b:rgba(0,255,182,.14);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12141B; --card:#1B1E27; --ink:#F2F3F7; --muted:#A0A6B4; --line:#2B2F3B;
+  --purple:#8F55FF; --purple-soft:#2A2145; --part:#5E43A6; --no:#343947; --green-ink:#00FFB6; --green-soft:#10352C;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  --glow-a:rgba(143,85,255,.25); --glow-b:rgba(0,255,182,.14);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100%;overflow-x:hidden;position:relative}
+.glow{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.glow.a{width:420px;height:420px;background:var(--glow-a);top:-120px;right:-120px}
+.glow.b{width:360px;height:360px;background:var(--glow-b);bottom:-140px;left:-120px}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:24px 20px 48px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em;font-size:15px}
+.brand svg{width:26px;height:26px}
+.pill{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:999px;white-space:nowrap}
+.pill b{color:var(--ink)}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:24px}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 18px;font-weight:600;transition:background .15s,transform .1s}
+button:active{transform:scale(.98)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+.btn-primary{background:var(--purple);color:#fff}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{background:var(--purple-soft)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+
+/* ---------- Lobby ---------- */
+.lobby{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch}
+.lobby h1{font-size:clamp(34px,5vw,60px);color:var(--ink)}
+.lobby h1 span{display:block;color:var(--purple)}
+.lede{font-size:18px;color:var(--muted);max-width:52ch;margin:18px 0 28px}
+.qrbox{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+#qr{background:#fff;padding:14px;border-radius:14px;line-height:0}
+#qr img,#qr canvas{width:220px!important;height:220px!important}
+.count-big{font-size:64px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--purple)}
+.linkfield{display:flex;gap:8px;width:100%}
+.linkfield input{flex:1;min-width:0;font:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.rules div{background:var(--bg);border-radius:12px;padding:14px;font-size:14px;color:var(--muted)}
+.rules b{display:block;color:var(--ink);margin-bottom:2px}
+
+/* ---------- Question (host) ---------- */
+.stage{display:grid;grid-template-columns:1fr 300px;gap:24px}
+.progress{display:flex;gap:6px;margin-bottom:22px}
+.progress i{flex:1;height:6px;border-radius:99px;background:var(--line)}
+.progress i.done{background:var(--purple)}
+.progress i.now{background:var(--green)}
+.qnum{font-weight:700;color:var(--purple);font-size:15px;margin-bottom:10px}
+.statement{font-size:clamp(28px,3.6vw,48px);font-weight:800;letter-spacing:-.025em;line-height:1.15;max-width:22ch;min-height:3.45em}
+.dim-tag{display:inline-block;margin-top:18px;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--purple-soft);color:var(--purple)}
+.answer-zone{margin-top:32px}
+.bigbar{height:72px;border-radius:16px;background:var(--bg);overflow:hidden;position:relative;border:1px solid var(--line)}
+.bigbar .fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--purple),#9B6BFF);border-radius:16px;width:var(--w)}
+.bigbar .fill.anim{animation:grow 1.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{width:0}to{width:var(--w)}}
+.bigbar .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-weight:700;font-size:20px}
+.bigbar .lbl .yes{color:#fff;mix-blend-mode:normal}
+.pct-huge{font-size:clamp(56px,7vw,96px);font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--purple)}
+.hidden-result{display:flex;align-items:center;gap:14px;padding:22px;border-radius:16px;border:1px dashed var(--line);color:var(--muted)}
+.dots{display:flex;gap:6px}
+.dots span{width:8px;height:8px;border-radius:50%;background:var(--purple);opacity:.3;animation:blink 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:1}}
+.side h3{font-size:15px;margin-bottom:14px}
+.ladder{display:flex;flex-direction:column;gap:7px}
+.ladder .step{display:grid;grid-template-columns:22px 1fr 40px;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.ladder .track{height:8px;border-radius:99px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.ladder .track b{display:block;height:100%;background:var(--purple);border-radius:99px}
+.ladder .step.cur{color:var(--ink);font-weight:700}
+.ladder .step.cur .track b{background:var(--green)}
+.controls{margin-top:28px}
+.kbd{font-size:12px;color:var(--muted)}
+
+.stack3{display:flex;height:72px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--bg)}
+.stack3.anim{animation:reveal 1.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes reveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.seg{height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;overflow:hidden;white-space:nowrap}
+.seg.yes{background:var(--purple);color:#fff}
+.seg.part{background:var(--part);color:var(--ink)}
+.seg.no{background:var(--no);color:var(--muted)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:14px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle;background:var(--c)}
+.legend b{color:var(--ink)}
+.mini{display:flex;height:100%;width:100%}
+.mini i{display:block;height:100%}
+.hbar .track .mini{border-radius:99px;overflow:hidden}
+
+/* ---------- Results ---------- */
+.res-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.res-head h1{font-size:clamp(30px,4vw,48px)}
+.grid-res{display:grid;grid-template-columns:320px 1fr;gap:20px}
+.donut-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.donut{position:relative;width:200px;height:200px}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut .val strong{font-size:54px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.hl{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:6px}
+.hl div{border-radius:14px;padding:14px;text-align:left}
+.hl .strong{background:var(--green-soft)}
+.hl .opp{background:var(--purple-soft)}
+.hl small{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.hl b{font-size:15px;line-height:1.25;display:block}
+.hl em{font-style:normal;font-weight:800;font-size:22px;display:block;margin-top:6px}
+.hbar{display:grid;grid-template-columns:minmax(120px,190px) 1fr 52px;gap:12px;align-items:center;margin:10px 0;font-size:14px}
+.hbar .track{height:12px;border-radius:99px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.hbar .track b{display:block;height:100%;border-radius:99px;background:var(--purple)}
+.hbar .track b.g{background:var(--green)}
+.hbar .num{text-align:right;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.card h3{font-size:17px;margin-bottom:6px}
+.card .sub{font-size:13px;color:var(--muted);margin:0 0 12px}
+.stair .hbar{grid-template-columns:28px 1fr 52px;margin:7px 0}
+.stair .txt{grid-column:1/-1;font-size:13px;color:var(--muted);margin:-2px 0 0 40px}
+.stair .n{font-weight:700;color:var(--purple)}
+.note{font-size:12px;color:var(--muted);margin-top:18px;max-width:80ch}
+
+/* ---------- Participant ---------- */
+.phone{max-width:520px;margin:0 auto}
+.phone .statement{font-size:clamp(24px,6.5vw,32px);max-width:none;min-height:0}
+.vote{display:grid;grid-template-columns:1fr;gap:10px;margin-top:28px}
+.vote button{padding:18px 10px;font-size:19px;font-weight:700;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.vote button[aria-pressed="true"].yes{background:var(--purple);border-color:var(--purple);color:#fff}
+.vote button[aria-pressed="true"].part{background:var(--part);border-color:var(--part);color:var(--ink)}
+.vote button[aria-pressed="true"].no{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.status{margin-top:16px;font-size:14px;color:var(--muted);min-height:1.5em}
+.status.ok{color:var(--green-ink);font-weight:600}
+.center{text-align:center}
+.wait h2{font-size:26px;margin:16px 0 8px}
+.band-card{margin-top:16px;border-radius:16px;padding:20px;background:var(--purple-soft)}
+.band-card h3{font-size:22px;color:var(--purple);margin:4px 0 8px}
+.err{border-left:4px solid var(--purple)}
+
+@media (max-width:900px){
+  .lobby,.stage,.grid-res,.two{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .statement{min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="glow a"></div><div class="glow b"></div>
+<div class="wrap">
+  <header class="top">
+    <span></span>
+    <div id="topRight"></div>
+  </header>
+  <main id="app" aria-live="polite">
+    <div class="card center"><p class="muted">Carregando a dinâmica…</p></div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÃO: cole aqui o link do Apps Script (termina em /exec)
+   ========================================================= */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu6O8COJaBLniudjJEe18Mz8yb0hHaBxDIn4a3aHUSykzFUlvH3Hw0xr3G9x_iOCoj/exec";
+
+const ITEMS = [
+  {t:"Uso IA generativa para tirar dúvidas ou buscar informações", d:"basica"},
+  {t:"Uso IA generativa para melhorar meus textos", d:"basica"},
+  {t:"Antes de colocar uma informação na IA, avalio se ela é sigilosa ou sensível", d:"etica"},
+  {t:"Confiro fatos, números ou fontes que a IA me dá antes de usar", d:"avaliacao"},
+  {t:"Dou contexto e formato esperado quando peço algo à IA", d:"prompts"},
+  {t:"Já identifiquei um erro ou uma “invenção” da IA numa resposta que parecia correta", d:"avaliacao"},
+  {t:"Sei dizer em quais tarefas a IA não deve ser usada na nossa empresa", d:"etica"},
+  {t:"Já usei IA para fazer algo que eu não conseguiria fazer sozinha(o), e não só para ganhar tempo", d:"inovadora"},
+  {t:"Tenho um assistente de IA configurado com minhas próprias instruções (GPT personalizado, Projeto, Gem ou similar) que reutilizo no dia a dia", d:"prompts"},
+  {t:"Parte das minhas tarefas repetitivas roda automaticamente com IA, sem eu precisar pedir toda vez", d:"inovadora"},
+  {t:"Já criei um fluxo, automação, agente ou ferramenta com IA que outras pessoas usam", d:"inovadora"}
+];
+const DIMS = {
+  basica:{n:"Competência técnica básica"},
+  etica:{n:"Ética e conformidade"},
+  avaliacao:{n:"Avaliação de conteúdo"},
+  prompts:{n:"Otimização de prompts"},
+  inovadora:{n:"Aplicação inovadora"}
+};
+const BANDS = [
+  {min:0,   n:"Exploração inicial", d:"A IA ainda aparece pouco na rotina. O próximo passo é experimentá-la em tarefas simples do dia a dia."},
+  {min:.30, n:"Uso em desenvolvimento", d:"A IA já faz parte da rotina. O próximo passo é usá-la com mais critério: dar contexto, checar respostas e cuidar dos dados."},
+  {min:.60, n:"Uso informado", d:"Uso consistente e crítico. O próximo passo é transformar o que funciona em assistentes e rotinas reutilizáveis."},
+  {min:.85, n:"Uso avançado", d:"A IA está integrada ao seu trabalho e ao de outras pessoas. Um bom próximo passo é compartilhar o que você construiu."}
+];
+const OPTS = [
+  {v:1,   n:"Sim",       cls:"yes"},
+  {v:0.5, n:"Em parte",  cls:"part"},
+  {v:0,   n:"Ainda não", cls:"no"}
+];
+const bandOf = p => { let b = BANDS[0]; for (const x of BANDS) if (p >= x.min) b = x; return b; };
+const val = x => x === true ? 1 : x === false ? 0 : (typeof x === 'number' ? x : null);
+const fmtPct = v => Math.round(v*100) + '%';
+const pctTxt = fmtPct;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newSession = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const app = document.getElementById('app');
+const topRight = document.getElementById('topRight');
+const PARTICIPANT_URL = location.origin + location.pathname;
+const IS_HOST = new URLSearchParams(location.search).has('facilitar');
+
+function store(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(_) { return null; } }
+function sstore(k, v){ try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch(_) { return null; } }
+
+let PID = store('maturidade-pid');
+if (!PID){ PID = 'p' + Math.random().toString(36).slice(2) + Date.now().toString(36); store('maturidade-pid', PID); }
+
+const S = {
+  control:null, loaded:false, participants:[], pin: sstore('maturidade-pin') || '',
+  hostReady:false, pinError:'', mine:null, status:'', statusOk:false, offline:false,
+  animKey:null, busy:false
+};
+
+/* ---------- API ---------- */
+async function api(params, post){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const res = post
+      ? await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify(params), signal: ctrl.signal})
+      : await fetch(SCRIPT_URL + '?' + new URLSearchParams(params) + '&_=' + Date.now(), {signal: ctrl.signal});
+    const data = await res.json();
+    S.offline = false;
+    return data;
+  } catch(e){
+    S.offline = true;
+    return {ok:false, error:'rede'};
+  } finally { clearTimeout(t); }
+}
+
+function loadMine(){
+  if (!S.control) { S.mine = null; return; }
+  try { const m = JSON.parse(store('maturidade-mine') || 'null'); S.mine = (m && m.session === S.control.session) ? m : null; }
+  catch(_) { S.mine = null; }
+}
+function saveMineLocal(){ store('maturidade-mine', JSON.stringify(S.mine)); }
+
+/* ---------- stats ---------- */
+function itemStats(list){
+  return ITEMS.map((_, i) => {
+    const vals = list.map(v => v.answers ? val(v.answers[i]) : null).filter(x => x !== null);
+    const n = vals.length;
+    const yes = vals.filter(x => x === 1).length;
+    const part = vals.filter(x => x === 0.5).length;
+    const no = n - yes - part;
+    return {n, yes, part, no,
+      p: n ? vals.reduce((a,b)=>a+b,0)/n : 0,
+      pYes: n ? yes/n : 0, pPart: n ? part/n : 0, pNo: n ? no/n : 0,
+      reach: n ? (yes+part)/n : 0};
+  });
+}
+function personScores(list){
+  return list.map(v => {
+    const a = v.answers || {};
+    const vals = Object.keys(a).map(k => val(a[k])).filter(x => x !== null);
+    if (vals.length < Math.ceil(ITEMS.length/2)) return null;
+    return vals.reduce((s,x)=>s+x,0) / vals.length;
+  }).filter(x => x !== null);
+}
+function dimStats(stats){
+  const out = {};
+  for (const k in DIMS){
+    const idx = ITEMS.map((it,i)=>it.d===k?i:-1).filter(i=>i>=0 && stats[i].n>0);
+    out[k] = idx.length ? idx.reduce((s,i)=>s+stats[i].p,0)/idx.length : 0;
+  }
+  return out;
+}
+
+/* ---------- host control ---------- */
+async function setControl(patch){
+  const next = Object.assign({}, S.control || {}, patch, {updatedAt: Date.now()});
+  const prev = S.control;
+  S.control = next; render();
+  S.busy = true;
+  const r = await api({action:'control', pin:S.pin, control:next}, true);
+  S.busy = false;
+  if (!r.ok){
+    S.control = prev;
+    if (r.error === 'pin'){ S.hostReady = false; S.pinError = 'PIN incorreto.'; }
+    else alert('Não foi possível atualizar a dinâmica. Verifique a conexão e tente de novo.');
+  }
+  render();
+}
+
+/* ---------- loops ---------- */
+async function hostLoop(){
+  while (true){
+    if (S.hostReady){
+      const r = await api({action:'results', pin:S.pin});
+      if (r.ok){
+        const lc = S.control, rc = r.control;
+        if (!S.busy && (!lc || !rc || (rc.updatedAt||0) >= (lc.updatedAt||0))) S.control = rc;
+        S.participants = r.participants || [];
+        S.loaded = true;
+      } else if (r.error === 'pin'){ S.hostReady = false; S.pinError = 'PIN incorreto.'; }
+      render();
+    }
+    await sleep(2500);
+  }
+}
+async function participantLoop(){
+  while (true){
+    const r = await api({action:'state'});
+    if (r.ok){
+      const prevKey = S.control ? S.control.session + S.control.stage + S.control.q + S.control.revealed : '';
+      S.control = r.control;
+      S.loaded = true;
+      loadMine();
+      const key = S.control ? S.control.session + S.control.stage + S.control.q + S.control.revealed : '';
+      if (key !== prevKey){ S.status = ''; }
+    } else { S.loaded = true; }
+    render();
+    await sleep(2800 + Math.random()*1200);
+  }
+}
+
+/* ---------- render ---------- */
+function render(){
+  renderTop();
+  if (!/^https:\/\/script\.google\.com\//.test(SCRIPT_URL)) return renderNotConfigured();
+  if (IS_HOST){
+    if (!S.hostReady) return renderPin();
+    if (!S.loaded) return;
+    return renderHost();
+  }
+  if (!S.loaded) return;
+  return renderParticipant();
+}
+function renderTop(){
+  let h = '';
+  if (IS_HOST && S.hostReady && S.control){
+    const n = S.participants.length;
+    h = `<div class="row"><span class="pill"><b>${n}</b> ${n===1?'pessoa conectada':'pessoas conectadas'}</span>
+      <a class="btn-ghost small" style="text-decoration:none;padding:10px 14px;border-radius:12px;color:var(--ink)" href="${esc(PARTICIPANT_URL)}" target="_blank" rel="noopener">Abrir tela de participante</a></div>`;
+  }
+  if (S.offline) h = `<span class="pill">Reconectando…</span>` + h;
+  topRight.innerHTML = h;
+}
+function renderNotConfigured(){
+  app.innerHTML = `<div class="card err phone"><h2 style="font-size:24px;margin-bottom:10px">Falta conectar a planilha</h2>
+    <p class="muted">Abra o arquivo index.html, procure por SCRIPT_URL no início do código e cole o link do Apps Script (termina em /exec).</p></div>`;
+}
+function renderPin(){
+  app.innerHTML = `<div class="card phone">
+    <h2 style="font-size:26px;margin-bottom:8px">Área de facilitação</h2>
+    <p class="muted">Digite o PIN definido no Apps Script.</p>
+    <div class="linkfield" style="margin-top:14px">
+      <input id="pinIn" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN">
+      <button class="btn-primary" data-act="pin">Entrar</button>
+    </div>
+    <p class="status" style="color:var(--purple)">${esc(S.pinError)}</p>
+  </div>`;
+  const i = document.getElementById('pinIn');
+  if (i){ i.focus(); i.addEventListener('keydown', e => { if (e.key === 'Enter') document.querySelector('[data-act="pin"]').click(); }); }
+}
+
+/* ===== HOST ===== */
+function renderHost(){
+  const c = S.control;
+  if (!c) return renderHostSetup();
+  if (c.stage === 'lobby') return renderLobby();
+  if (c.stage === 'question') return renderHostQuestion();
+  if (c.stage === 'results') return renderResults();
+}
+function renderHostSetup(){
+  app.innerHTML = `<div class="lobby">
+    <div class="card">
+      <h1>Maturidade em IA<span>ao vivo</span></h1>
+      <p class="lede">Abra a sala para que as pessoas entrem pelo celular. As respostas são anônimas e o diagnóstico aparece no final.</p>
+      <button class="btn-primary" data-act="openRoom">Abrir sala de votação</button>
+    </div>
+    <div class="card qrbox"><p class="muted">O QR code aparece aqui quando a sala estiver aberta.</p></div>
+  </div>`;
+}
+let qrDrawn = null;
+function renderLobby(){
+  const n = S.participants.length;
+  app.innerHTML = `<div class="lobby">
+    <div class="card">
+      <h1>Qual é o nosso nível<span>de maturidade em IA?</span></h1>
+      <p class="lede">Aponte a câmera do celular para o QR code e toque em “Participar”. Vão aparecer ${ITEMS.length} afirmativas, uma de cada vez. Responda com sinceridade: não existe resposta certa.</p>
+      <div class="rules">
+        <div><b>Anônimo</b>Ninguém vê quem respondeu o quê.</div>
+        <div><b>Três respostas</b>Sim, em parte ou ainda não.</div>
+        <div><b>Sem ranking</b>O resultado é sempre do grupo.</div>
+      </div>
+      <div class="row controls">
+        <button class="btn-primary" data-act="start" ${n?'':'disabled'}>Começar a dinâmica</button>
+        <button class="btn-ghost" data-act="reset">Nova sessão</button>
+      </div>
+    </div>
+    <div class="card qrbox">
+      <div id="qr" role="img" aria-label="QR code do link de participação"></div>
+      <div><div class="count-big">${n}</div><div class="muted">${n===1?'pessoa conectada':'pessoas conectadas'}</div></div>
+      <p class="muted small" style="margin:0;word-break:break-all">${esc(PARTICIPANT_URL)}</p>
+    </div>
+  </div>`;
+  const el = document.getElementById('qr');
+  if (el && typeof QRCode !== 'undefined'){
+    new QRCode(el, {text:PARTICIPANT_URL, width:440, height:440, colorDark:'#1F2937', colorLight:'#FFFFFF', correctLevel:QRCode.CorrectLevel.M});
+  }
+}
+function progressBar(q){
+  return `<div class="progress" aria-hidden="true">${ITEMS.map((_,i)=>`<i class="${i<q?'done':i===q?'now':''}"></i>`).join('')}</div>`;
+}
+function renderHostQuestion(){
+  const c = S.control, q = c.q, it = ITEMS[q];
+  const list = S.participants;
+  const stats = itemStats(list);
+  const st = stats[q];
+  const total = list.length;
+  const key = c.session + '-' + q;
+  const animate = c.revealed && S.animKey !== key;
+  if (c.revealed) S.animKey = key;
+  const seg = (cls, v) => v > 0 ? `<div class="seg ${cls}" style="width:${(v*100).toFixed(1)}%">${v>=.08?fmtPct(v):''}</div>` : '';
+  const answer = c.revealed
+    ? `<div class="row" style="align-items:flex-end;gap:18px;margin-bottom:16px">
+         <div class="pct-huge">${fmtPct(st.reach)}</div>
+         <div class="muted" style="padding-bottom:10px">já praticam, total ou em parte<br>${st.n} ${st.n===1?'resposta':'respostas'}</div>
+       </div>
+       <div class="stack3 ${animate?'anim':''}">${seg('yes',st.pYes)}${seg('part',st.pPart)}${seg('no',st.pNo)}</div>
+       <div class="legend">
+         <span style="--c:var(--purple)">Sim <b>${fmtPct(st.pYes)}</b></span>
+         <span style="--c:var(--part)">Em parte <b>${fmtPct(st.pPart)}</b></span>
+         <span style="--c:var(--no)">Ainda não <b>${fmtPct(st.pNo)}</b></span>
+       </div>`
+    : `<div class="hidden-result"><div class="dots"><span></span><span></span><span></span></div>
+         <div><b style="color:var(--ink);font-size:20px">${st.n} de ${total}</b> já responderam. O resultado fica oculto até você revelar.</div></div>`;
+  const ladder = ITEMS.map((_,i) => {
+    const shown = i < q || (i === q && c.revealed);
+    const s = stats[i];
+    return `<div class="step ${i===q?'cur':''}"><span>${i+1}</span>
+      <div class="track">${shown?`<div class="mini"><i style="width:${(s.pYes*100).toFixed(1)}%;background:var(--purple)"></i><i style="width:${(s.pPart*100).toFixed(1)}%;background:var(--part)"></i></div>`:''}</div>
+      <span style="text-align:right">${shown?fmtPct(s.reach):'–'}</span></div>`;
+  }).join('');
+  const last = q === ITEMS.length - 1;
+  app.innerHTML = `<div class="stage">
+    <div class="card">
+      ${progressBar(q)}
+      <div class="qnum">Afirmativa ${q+1} de ${ITEMS.length}</div>
+      <div class="statement">${esc(it.t)}</div>
+      <span class="dim-tag">${DIMS[it.d].n}</span>
+      <div class="answer-zone">${answer}</div>
+      <div class="row controls">
+        <button class="btn-ghost" data-act="prev" ${q===0?'disabled':''}>Anterior</button>
+        <span class="spacer"></span>
+        ${c.revealed
+          ? `<button class="btn-primary" data-act="next">${last?'Ver diagnóstico':'Próxima afirmativa'}</button>`
+          : `<button class="btn-primary" data-act="reveal">Revelar resultado</button>`}
+      </div>
+      <p class="kbd" style="margin-top:10px">Atalho: seta para a direita avança, seta para a esquerda volta.</p>
+    </div>
+    <aside class="card side">
+      <h3>A escada até aqui</h3>
+      <div class="ladder">${ladder}</div>
+    </aside>
+  </div>`;
+}
+function donutSVG(p){
+  const r = 80, C = 2*Math.PI*r;
+  return `<svg viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="${r}" fill="none" stroke="var(--line)" stroke-width="16"/>
+    <circle cx="100" cy="100" r="${r}" fill="none" stroke="var(--purple)" stroke-width="16" stroke-linecap="round"
+      stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}"/>
+  </svg>`;
+}
+function renderResults(){
+  const list = S.participants;
+  const stats = itemStats(list);
+  const dims = dimStats(stats);
+  const scores = personScores(list);
+  const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 0;
+  const idx = (avg*10).toFixed(1).replace('.', ',');
+  const bandCounts = BANDS.map(b => ({b, n:0}));
+  scores.forEach(s => { const b = bandOf(s); bandCounts.find(x=>x.b===b).n++; });
+  const dimArr = Object.keys(DIMS).map(k => ({k, n:DIMS[k].n, p:dims[k]}));
+  const sorted = [...dimArr].sort((a,b)=>b.p-a.p);
+  const best = sorted[0], worst = sorted[sorted.length-1];
+  const groupBand = bandOf(avg);
+  app.innerHTML = `
+  <div class="res-head">
+    <div>
+      <p class="qnum" style="margin:0 0 6px">Diagnóstico do grupo</p>
+      <h1>Nosso retrato de maturidade em IA</h1>
+    </div>
+    <div class="row">
+      <button class="btn-ghost" data-act="csv">Baixar resultados (CSV)</button>
+      <button class="btn-ghost" data-act="backQ">Voltar às afirmativas</button>
+      <button class="btn-ghost" data-act="reset">Nova sessão</button>
+    </div>
+  </div>
+  <div class="grid-res">
+    <div class="stack">
+      <div class="card donut-card">
+        <div class="donut">${donutSVG(avg)}<div class="val"><strong>${idx}</strong><span class="muted small">de 10</span></div></div>
+        <div><b style="font-size:18px">${groupBand.n}</b><p class="muted small" style="margin:4px 0 0">Índice médio de ${scores.length} ${scores.length===1?'pessoa':'pessoas'}</p></div>
+        <div class="hl">
+          <div class="strong"><small>Maior força</small><b>${best.n}</b><em>${pctTxt(best.p)}</em></div>
+          <div class="opp"><small>Principal oportunidade</small><b>${worst.n}</b><em>${pctTxt(worst.p)}</em></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Como o grupo se distribui</h3>
+        <p class="sub">Quantas pessoas estão em cada faixa, pela pontuação média de cada uma.</p>
+        ${bandCounts.map(x => `<div class="hbar"><span>${x.b.n}</span>
+          <div class="track"><b class="g" style="width:${scores.length?(x.n/scores.length*100).toFixed(1):0}%"></b></div>
+          <span class="num">${x.n}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <h3>As cinco dimensões</h3>
+        <p class="sub">Pontuação média das afirmativas de cada dimensão (sim vale 1, em parte vale 0,5).</p>
+        ${dimArr.map(d => `<div class="hbar"><span>${d.n}</span>
+          <div class="track"><b style="width:${(d.p*100).toFixed(1)}%"></b></div>
+          <span class="num">${pctTxt(d.p)}</span></div>`).join('')}
+      </div>
+      <div class="card stair">
+        <h3>A escada completa</h3>
+        <p class="sub">Quanto do grupo já pratica cada comportamento: <span style="color:var(--purple);font-weight:600">sim</span> somado a <span style="font-weight:600">em parte</span>.</p>
+        ${ITEMS.map((it,i) => `<div class="hbar"><span class="n">${i+1}</span>
+          <div class="track"><div class="mini"><i style="width:${(stats[i].pYes*100).toFixed(1)}%;background:var(--purple)"></i><i style="width:${(stats[i].pPart*100).toFixed(1)}%;background:var(--part)"></i></div></div>
+          <span class="num">${pctTxt(stats[i].reach)}</span>
+          <span class="txt">${esc(it.t)}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+  <p class="note">Leitura de apoio ao desenvolvimento, não um instrumento psicométrico validado. Pontuação: sim vale 1, em parte vale 0,5 e ainda não vale 0. Faixas pela pontuação média de cada pessoa: exploração inicial (menos de 30%), uso em desenvolvimento (30% a 59%), uso informado (60% a 84%) e uso avançado (85% ou mais). Entram no cálculo individual as pessoas que responderam pelo menos metade das afirmativas.</p>`;
+}
+
+/* ===== PARTICIPANT ===== */
+function renderParticipant(){
+  const c = S.control;
+  const joined = !!S.mine;
+  let body = '';
+  if (!c){
+    body = waitCard('A sala ainda não foi aberta', 'Assim que a facilitação abrir a votação, esta tela atualiza sozinha.');
+  } else if (!joined){
+    body = `<div class="card center wait">
+      <h2>Maturidade em IA</h2>
+      <p class="muted">São ${ITEMS.length} afirmativas rápidas: responda sim, em parte ou ainda não. Suas respostas são anônimas.</p>
+      <button class="btn-primary" data-act="join" style="margin-top:14px;width:100%;padding:16px">Participar</button>
+      <p class="status">${esc(S.status)}</p>
+    </div>`;
+  } else if (c.stage === 'lobby'){
+    body = waitCard('Você está na sala', 'Aguarde: a primeira afirmativa aparece aqui quando a dinâmica começar.');
+  } else if (c.stage === 'question'){
+    const q = c.q, it = ITEMS[q];
+    const raw = S.mine.answers ? S.mine.answers[q] : undefined;
+    const cur = raw === undefined ? undefined : val(raw);
+    const locked = !!c.revealed;
+    let status = S.status;
+    if (locked) status = cur === undefined ? 'Esta afirmativa já foi encerrada.' : 'Resultado no telão.';
+    body = `<div class="card">
+      ${progressBar(q)}
+      <div class="qnum">Afirmativa ${q+1} de ${ITEMS.length}</div>
+      <div class="statement">${esc(it.t)}</div>
+      <div class="vote">
+        ${OPTS.map(o => `<button class="${o.cls}" data-act="vote" data-v="${o.v}" aria-pressed="${cur===o.v}" ${locked?'disabled':''}>${o.n}</button>`).join('')}
+      </div>
+      <p class="status ${S.statusOk && !locked?'ok':''}">${esc(status)}</p>
+    </div>`;
+  } else if (c.stage === 'results'){
+    const a = S.mine.answers || {};
+    const vals = Object.keys(a).map(k => val(a[k])).filter(x => x !== null);
+    const yes = vals.filter(x => x === 1).length, part = vals.filter(x => x === 0.5).length;
+    const b = vals.length ? bandOf(vals.reduce((s,x)=>s+x,0)/vals.length) : null;
+    body = `<div class="card center wait">
+      <h2>Obrigada pela participação!</h2>
+      <p class="muted">O diagnóstico do grupo está no telão.</p>
+      ${b ? `<div class="band-card" style="text-align:left">
+        <p class="small muted" style="margin:0">Só você vê isto. Sua leitura pessoal:</p>
+        <h3>${b.n}</h3>
+        <p style="margin:0">${b.d}</p>
+        <p class="small muted" style="margin:10px 0 0">De ${vals.length} afirmativas, você respondeu sim em ${yes} e em parte em ${part}.</p>
+      </div>` : ''}
+    </div>`;
+  }
+  app.innerHTML = `<div class="phone">${body}</div>`;
+}
+function waitCard(t, d){
+  return `<div class="card center wait"><div class="dots" style="justify-content:center"><span></span><span></span><span></span></div>
+    <h2>${t}</h2><p class="muted">${d}</p></div>`;
+}
+
+/* ---------- actions ---------- */
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const act = el.dataset.act;
+  const c = S.control;
+  switch(act){
+    case 'pin': {
+      const v = (document.getElementById('pinIn').value || '').trim();
+      if (!v) return;
+      el.disabled = true;
+      S.pin = v;
+      const r = await api({action:'results', pin:v});
+      if (r.ok){
+        sstore('maturidade-pin', v); S.hostReady = true; S.pinError = '';
+        S.control = r.control; S.participants = r.participants || []; S.loaded = true;
+      } else S.pinError = r.error === 'pin' ? 'PIN incorreto.' : 'Não foi possível conectar à planilha. Confira o link do Apps Script.';
+      render(); break;
+    }
+    case 'openRoom': await setControl({session:newSession(), stage:'lobby', q:0, revealed:false}); break;
+    case 'start': await setControl({stage:'question', q:0, revealed:false}); break;
+    case 'reveal': await setControl({revealed:true}); break;
+    case 'next':
+      if (c.q < ITEMS.length-1) await setControl({q:c.q+1, revealed:false});
+      else await setControl({stage:'results'});
+      break;
+    case 'prev': if (c.q > 0) await setControl({q:c.q-1, revealed:true}); break;
+    case 'backQ': await setControl({stage:'question', q:ITEMS.length-1, revealed:true}); break;
+    case 'reset':
+      if (confirm('Começar uma nova sessão? As respostas atuais deixam de aparecer no painel (continuam guardadas na planilha).')){
+        S.animKey = null; S.participants = [];
+        await setControl({session:newSession(), stage:'lobby', q:0, revealed:false});
+      }
+      break;
+    case 'join': {
+      el.disabled = true;
+      const r = await api({action:'join', session:c.session, pid:PID}, true);
+      if (r.ok){ S.mine = {session:c.session, answers:{}}; saveMineLocal(); S.status = ''; }
+      else S.status = 'Não foi possível entrar agora. Toque de novo.';
+      render(); break;
+    }
+    case 'vote': {
+      if (!c || c.stage !== 'question' || c.revealed || !S.mine) return;
+      const v = Number(el.dataset.v), q = c.q;
+      const before = S.mine.answers[q];
+      S.mine.answers[q] = v; saveMineLocal();
+      S.status = 'Registrando…'; S.statusOk = false; render();
+      const r = await api({action:'vote', session:c.session, pid:PID, q, v}, true);
+      if (r.ok){ S.status = 'Resposta registrada. Você pode mudar até o resultado aparecer.'; S.statusOk = true; }
+      else {
+        if (before === undefined) delete S.mine.answers[q]; else S.mine.answers[q] = before;
+        saveMineLocal();
+        S.status = r.error === 'fechada' ? 'Esta afirmativa já foi encerrada.' : 'Não foi possível registrar. Toque de novo.';
+        S.statusOk = false;
+      }
+      render(); break;
+    }
+    case 'csv': exportCSV(); break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if (!IS_HOST || !S.hostReady || !S.control || S.control.stage !== 'question') return;
+  if (e.target && e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight'){
+    e.preventDefault();
+    document.querySelector(S.control.revealed ? '[data-act="next"]' : '[data-act="reveal"]')?.click();
+  } else if (e.key === 'ArrowLeft' && S.control.q > 0){
+    e.preventDefault(); document.querySelector('[data-act="prev"]')?.click();
+  }
+});
+function exportCSV(){
+  const list = S.participants;
+  const stats = itemStats(list);
+  const q = s => '"' + String(s).replace(/"/g,'""') + '"';
+  const f = v => (v*100).toFixed(1).replace('.',',');
+  const lines = [];
+  lines.push(['Afirmativa','Texto','Dimensão','Respostas','Sim','Em parte','Ainda não','% Sim','% Em parte','% Ainda não','Pontuação média (%)'].map(q).join(';'));
+  ITEMS.forEach((it,i) => { const s = stats[i]; lines.push([i+1, it.t, DIMS[it.d].n, s.n, s.yes, s.part, s.no, f(s.pYes), f(s.pPart), f(s.pNo), f(s.p)].map(q).join(';')); });
+  lines.push('');
+  lines.push(['Resposta anônima', ...ITEMS.map((_,i)=>'A'+(i+1))].map(q).join(';'));
+  list.forEach((v,r) => {
+    const a = v.answers || {};
+    lines.push([ 'R'+(r+1), ...ITEMS.map((_,i)=> { const x = val(a[i]); return x===1?'Sim':x===0.5?'Em parte':x===0?'Ainda não':''; }) ].map(q).join(';'));
+  });
+  const blob = new Blob(['\ufeff' + lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `maturidade-ia-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ---------- start ---------- */
+render();
+if (/^https:\/\/script\.google\.com\//.test(SCRIPT_URL)){
+  if (IS_HOST){
+    (async () => {
+      if (S.pin){
+        const r = await api({action:'results', pin:S.pin});
+        if (r.ok){ S.hostReady = true; S.control = r.control; S.participants = r.participants || []; S.loaded = true; }
+        render();
+      }
+      hostLoop();
+    })();
+  } else participantLoop();
+}
+</script>
+</body>
+</html>
